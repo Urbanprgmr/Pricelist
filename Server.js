@@ -11,9 +11,9 @@ app.use(bodyParser.json());
 
 // Cloudinary configuration
 cloudinary.config({
-  cloud_name: 'your_cloud_name',
-  api_key: 'your_api_key',
-  api_secret: 'your_api_secret',
+  cloud_name: 'Haseeb4795',
+  api_key: 'your_api_key'826177631731249',
+  api_secret: 'L--TnYFdZB5USyZHv4gkASOZReQ',
 });
 
 // MongoDB connection
