@@ -3,239 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Price List</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    h1 {
-      text-align: center;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    img {
-      width: 50px;
-      height: auto;
-    }
-    .export-buttons {
-      text-align: center;
-      margin-top: 20px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .admin-panel {
-      margin-bottom: 20px;
-    }
-    .admin-panel input {
-      margin: 5px;
-      padding: 8px;
-    }
-    #login-form {
-      margin-bottom: 20px;
-    }
-    #admin-panel {
-      display: none;
-    }
-  </style>
+  <title>Fruit & Veggie Prices</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <h1>Price List</h1>
-
-  <!-- Login Form -->
-  <div id="login-form">
-    <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <button onclick="signup()">Sign Up</button>
+  <div class="container">
+    <h1 class="text-center my-4">Fruit & Veggie Prices</h1>
+    <div id="items-list" class="row"></div>
+    <div class="text-center my-4">
+      <a href="https://viber.com" class="btn btn-success me-2"><i class="fab fa-viber"></i> Viber</a>
+      <a href="https://telegram.com" class="btn btn-primary me-2"><i class="fab fa-telegram"></i> Telegram</a>
+      <a href="https://whatsapp.com" class="btn btn-success"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    </div>
   </div>
-
-  <!-- Admin Panel -->
-  <div id="admin-panel" class="admin-panel">
-    <h2>Admin Panel</h2>
-    <input type="text" id="itemName" placeholder="Item Name">
-    <input type="number" id="itemPrice" placeholder="Price">
-    <input type="file" id="itemImage">
-    <button onclick="addItem()">Add Item</button>
-  </div>
-
-  <!-- Price List Table -->
-  <table id="price-list-table">
-    <thead>
-      <tr>
-        <th>Image</th>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="table-body">
-      <!-- Rows will be added dynamically -->
-    </tbody>
-  </table>
-
-  <!-- Export Buttons -->
-  <div class="export-buttons">
-    <button onclick="exportToPDF()">Export as PDF</button>
-    <button onclick="exportToExcel()">Export as Excel</button>
-  </div>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
-
-  <!-- Required Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
-
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-  apiKey: "AIzaSyDODWUQrK9_C94_8apkPfKph7dH0T-VWzQ",
-  authDomain: "price-sell-new.firebaseapp.com",
-  projectId: "price-sell-new",
-  storageBucket: "price-sell-new.firebasestorage.app",
-  messagingSenderId: "97719764820",
-  appId: "1:97719764820:web:7c83afecac08968cc1aac1",
-  measurementId: "G-D27Q6TTH8K"
-    };
+    const binId = '67ca3266e41b4d34e4a21490';
+    const apiKey = '$2a$10$ISnzYBxkpDNeersZBo0mVe5v/iOr89sUQyl.zGdj3v.pGlKBJLYgu';
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth(); // Initialize auth object
-
-    // Fetch items from backend
     async function fetchItems() {
-      const response = await fetch('http://localhost:5000/api/items');
-      const items = await response.json();
-      const tableBody = document.getElementById('table-body');
-      tableBody.innerHTML = items.map(item => `
-        <tr>
-          <td><img src="${item.imageUrl}" alt="${item.name}"></td>
-          <td>${item.name}</td>
-          <td>$${item.price.toFixed(2)}</td>
-          <td>
-            <button onclick="editItem('${item._id}')">Edit</button>
-            <button onclick="deleteItem('${item._id}')">Delete</button>
-          </td>
-        </tr>
+      const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+        headers: { 'X-Master-Key': apiKey }
+      });
+      const data = await response.json();
+      displayItems(data.record.items);
+    }
+
+    function displayItems(items) {
+      const itemsList = document.getElementById('items-list');
+      itemsList.innerHTML = items.map(item => `
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">${item.name}</h5>
+              <p class="card-text">Price: $${item.price} per ${item.unit}</p>
+              <p class="card-text"><small class="text-muted">Last updated: ${new Date(item.lastUpdated).toLocaleString()}</small></p>
+            </div>
+          </div>
+        </div>
       `).join('');
     }
 
-    // Add item
-    async function addItem() {
-      const name = document.getElementById('itemName').value;
-      const price = parseFloat(document.getElementById('itemPrice').value);
-      const image = document.getElementById('itemImage').files[0];
-
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('price', price);
-      formData.append('image', image);
-
-      await fetch('http://localhost:5000/api/items', {
-        method: 'POST',
-        body: formData,
-      });
-
-      fetchItems(); // Refresh the list
-    }
-
-    // Edit item
-    async function editItem(id) {
-      const newPrice = prompt('Enter new price:');
-      if (newPrice) {
-        await fetch(`http://localhost:5000/api/items/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ price: parseFloat(newPrice) }),
-        });
-        fetchItems(); // Refresh the list
-      }
-    }
-
-    // Delete item
-    async function deleteItem(id) {
-      await fetch(`http://localhost:5000/api/items/${id}`, { method: 'DELETE' });
-      fetchItems(); // Refresh the list
-    }
-
-    // Export to PDF
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.autoTable({ html: '#price-list-table' });
-      doc.save('price-list.pdf');
-    }
-
-    // Export to Excel
-    async function exportToExcel() {
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet('Price List');
-      const headers = [];
-      document.querySelectorAll('#price-list-table th').forEach(header => {
-        headers.push(header.innerText);
-      });
-      worksheet.addRow(headers);
-      document.querySelectorAll('#price-list-table tbody tr').forEach(row => {
-        const rowData = [];
-        row.querySelectorAll('td').forEach(cell => {
-          rowData.push(cell.innerText);
-        });
-        worksheet.addRow(rowData);
-      });
-      const buffer = await workbook.xlsx.writeBuffer();
-      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'price-list.xlsx';
-      link.click();
-    }
-
-    // Firebase login
-    async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        alert('Login successful!');
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('login-form').style.display = 'none';
-      } catch (error) {
-        alert('Login failed: ' + error.message);
-      }
-    }
-
-    // Firebase signup
-    async function signup() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      try {
-        await auth.createUserWithEmailAndPassword(email, password);
-        alert('Signup successful!');
-      } catch (error) {
-        alert('Signup failed: ' + error.message);
-      }
-    }
-
-    // Load items on page load
     fetchItems();
   </script>
 </body>
