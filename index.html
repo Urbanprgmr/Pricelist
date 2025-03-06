@@ -26,7 +26,7 @@
         headers: { 'X-Master-Key': apiKey }
       });
       const data = await response.json();
-      displayItems(data.record.items);
+      displayItems(data.record.items || []);
     }
 
     function displayItems(items) {
