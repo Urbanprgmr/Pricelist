@@ -54,13 +54,6 @@
       object-fit: cover;
       border-radius: 15px 15px 0 0;
     }
-    .section {
-      padding: 60px 0;
-    }
-    .section h2 {
-      margin-bottom: 30px;
-      color: #28a745;
-    }
   </style>
 </head>
 <body>
@@ -94,73 +87,6 @@
     <h1 class="text-center mb-4 animate__animated animate__fadeIn">FreshMart - Fruit & Veggie Prices</h1>
     <div id="items-list" class="row"></div>
   </div>
-
-  <!-- About Section -->
-  <div id="about" class="section bg-light">
-    <div class="container">
-      <h2 class="text-center">About Us</h2>
-      <div class="row">
-        <div class="col-md-6">
-          <img src="https://i.ibb.co/XYZ123/freshmart-about.jpg" alt="About Us" class="img-fluid rounded">
-        </div>
-        <div class="col-md-6">
-          <p>
-            Welcome to <strong>FreshMart</strong>, your one-stop destination for fresh fruits and vegetables at the best prices.
-            We are committed to providing high-quality produce sourced directly from local farmers. Our mission is to make
-            healthy eating affordable and accessible for everyone.
-          </p>
-          <p>
-            With a wide variety of items available in kilograms, grams, pieces, and trays, we ensure that you get exactly
-            what you need. Stay updated with our real-time pricing and enjoy the convenience of shopping with us.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Contact Section -->
-  <div id="contact" class="section">
-    <div class="container">
-      <h2 class="text-center">Contact Us</h2>
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <form id="contact-form">
-            <div class="mb-3">
-              <label for="name" class="form-label">Name</label>
-              <input type="text" class="form-control" id="name" required>
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" required>
-            </div>
-            <div class="mb-3">
-              <label for="message" class="form-label">Message</label>
-              <textarea class="form-control" id="message" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-success">Send Message</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Social Links -->
-  <div class="text-center my-4">
-    <a href="https://viber.com" class="btn btn-success btn-social">
-      <i class="fab fa-viber"></i> Viber
-    </a>
-    <a href="https://telegram.com" class="btn btn-primary btn-social">
-      <i class="fab fa-telegram"></i> Telegram
-    </a>
-    <a href="https://whatsapp.com" class="btn btn-success btn-social">
-      <i class="fab fa-whatsapp"></i> WhatsApp
-    </a>
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer text-center">
-    <p>&copy; 2025 FreshMart. All rights reserved.</p>
-  </footer>
 
   <script>
     const binId = '67ca3266e41b4d34e4a21490';
@@ -201,18 +127,6 @@
         `;
       }).join('');
     }
-
-    // Handle contact form submission
-    document.getElementById('contact-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const message = document.getElementById('message').value;
-
-      // Simulate sending the message (you can replace this with an actual API call)
-      alert(`Thank you, ${name}! Your message has been sent.`);
-      document.getElementById('contact-form').reset();
-    });
 
     fetchItems();
   </script>
