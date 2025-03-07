@@ -62,15 +62,11 @@
       color: #28a745;
     }
     .order-summary {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 300px;
       background: white;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       border-radius: 15px;
-      z-index: 1000;
+      margin-top: 20px;
     }
     .order-item {
       display: flex;
@@ -115,6 +111,19 @@
     <div id="items-list" class="row"></div>
   </div>
 
+  <!-- Order Summary -->
+  <div class="container order-summary">
+    <h5>Order Summary</h5>
+    <ul id="order-items" class="list-unstyled"></ul>
+    <p><strong>Total: <span id="total-price">MVR 0</span></strong></p>
+    <button class="btn btn-success w-100 mb-2" onclick="sendOrder('whatsapp')">
+      <i class="fab fa-whatsapp"></i> Send via WhatsApp
+    </button>
+    <button class="btn btn-primary w-100" onclick="sendOrder('viber')">
+      <i class="fab fa-viber"></i> Send via Viber
+    </button>
+  </div>
+
   <!-- About Section -->
   <div id="about" class="section bg-light">
     <div class="container">
@@ -136,14 +145,6 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Order Summary -->
-  <div class="order-summary">
-    <h5>Order Summary</h5>
-    <ul id="order-items" class="list-unstyled"></ul>
-    <p><strong>Total: <span id="total-price">MVR 0</span></strong></p>
-    <button class="btn btn-success w-100" onclick="sendOrder()">Place Order</button>
   </div>
 
   <script>
@@ -183,7 +184,7 @@
                 <p class="card-text">Price: MVR ${item.price} per ${item.unit}</p>
                 <div class="d-flex align-items-center">
                   <input type="number" id="quantity-${item.id}" class="form-control me-2" value="1" min="1" style="width: 80px;">
-                  <button class="btn btn-primary" onclick="addToOrder(${item.id}, '${item.name}', ${item.price})">Add to Order</button>
+                  <button class="btn btn-primary" onclick="addToOrder(${item.id}, '${item.name}', ${item.price}, '${item.unit}')">Add to Order</button>
                 </div>
               </div>
             </div>
@@ -193,13 +194,13 @@
     }
 
     // Add item to order
-    function addToOrder(id, name, price) {
+    function addToOrder(id, name, price, unit) {
       const quantity = parseInt(document.getElementById(`quantity-${id}`).value);
       if (isNaN(quantity) || quantity < 1) {
         alert('Please enter a valid quantity.');
         return;
       }
-      const item = { id, name, price, quantity };
+      const item = { id, name, price, unit, quantity };
       const existingItem = order.find(i => i.id === id);
       if (existingItem) {
         existingItem.quantity += quantity; // Increase quantity if item already exists
@@ -215,7 +216,10 @@
       const totalPrice = document.getElementById('total-price');
       orderItems.innerHTML = order.map(item => `
         <li class="order-item">
-          <span>${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}</span>
+          <div>
+            <strong>${item.name}</strong><br>
+            Unit: ${item.quantity}${item.unit}, Rate: MVR ${item.price}, Total: MVR ${item.price * item.quantity}
+          </div>
           <button class="btn btn-danger btn-sm" onclick="removeFromOrder(${item.id})">Remove</button>
         </li>
       `).join('');
@@ -229,19 +233,27 @@
       updateOrderSummary();
     }
 
-    function sendOrder() {
-  if (order.length === 0) {
-    alert('Your order is empty!');
-    return;
-  }
-  const orderDetails = order.map(item => `${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}`).join('%0A');
-  const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const message = `Order Details:%0A${orderDetails}%0A%0ATotal: MVR ${total}`;
-  const whatsappUrl = `https://wa.me/+9607267338?text=${message}`;
-  window.open(whatsappUrl, '_blank');
-  order = []; // Clear the order
-  updateOrderSummary();
-}
+    // Send order via WhatsApp or Viber
+    function sendOrder(platform) {
+      if (order.length === 0) {
+        alert('Your order is empty!');
+        return;
+      }
+      const orderDetails = order.map(item => `${item.name} (${item.quantity}${item.unit}) - Rate: MVR ${item.price}, Total: MVR ${item.price * item.quantity}`).join('%0A');
+      const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const message = `Order Details:%0A${orderDetails}%0A%0ATotal: MVR ${total}`;
+
+      if (platform === 'whatsapp') {
+        const whatsappUrl = `https://wa.me/+9607267338?text=${message}`;
+        window.open(whatsappUrl, '_blank');
+      } else if (platform === 'viber') {
+        const viberUrl = `viber://chat?number=+9607267338&text=${message}`;
+        window.open(viberUrl, '_blank');
+      }
+
+      order = []; // Clear the order
+      updateOrderSummary();
+    }
 
     fetchItems();
   </script>
