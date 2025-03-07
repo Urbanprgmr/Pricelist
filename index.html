@@ -183,7 +183,7 @@
                 <h5 class="card-title">${item.name}</h5>
                 <p class="card-text">Price: MVR ${item.price} per ${item.unit}</p>
                 <div class="d-flex align-items-center">
-                  <input type="number" id="quantity-${item.id}" class="form-control me-2" value="1" min="1" style="width: 80px;">
+                  <input type="number" id="quantity-${item.id}" class="form-control me-2" value="1" min="0.1" step="0.1" style="width: 80px;">
                   <button class="btn btn-primary" onclick="addToOrder(${item.id}, '${item.name}', ${item.price}, '${item.unit}')">Add to Order</button>
                 </div>
               </div>
@@ -195,8 +195,8 @@
 
     // Add item to order
     function addToOrder(id, name, price, unit) {
-      const quantity = parseInt(document.getElementById(`quantity-${id}`).value);
-      if (isNaN(quantity) || quantity < 1) {
+      const quantity = parseFloat(document.getElementById(`quantity-${id}`).value);
+      if (isNaN(quantity) || quantity <= 0) {
         alert('Please enter a valid quantity.');
         return;
       }
@@ -218,13 +218,13 @@
         <li class="order-item">
           <div>
             <strong>${item.name}</strong><br>
-            Unit: ${item.quantity}${item.unit}, Rate: MVR ${item.price}, Total: MVR ${item.price * item.quantity}
+            Unit: ${item.quantity}${item.unit}, Rate: MVR ${item.price}, Total: MVR ${(item.price * item.quantity).toFixed(2)}
           </div>
           <button class="btn btn-danger btn-sm" onclick="removeFromOrder(${item.id})">Remove</button>
         </li>
       `).join('');
       const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      totalPrice.textContent = `MVR ${total}`;
+      totalPrice.textContent = `MVR ${total.toFixed(2)}`;
     }
 
     // Remove item from order
@@ -239,9 +239,9 @@
         alert('Your order is empty!');
         return;
       }
-      const orderDetails = order.map(item => `${item.name} (${item.quantity}${item.unit}) - Rate: MVR ${item.price}, Total: MVR ${item.price * item.quantity}`).join('%0A');
+      const orderDetails = order.map(item => `${item.name} (${item.quantity}${item.unit}) - Rate: MVR ${item.price}, Total: MVR ${(item.price * item.quantity).toFixed(2)}`).join('%0A');
       const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const message = `Order Details:%0A${orderDetails}%0A%0ATotal: MVR ${total}`;
+      const message = `Order Details:%0A${orderDetails}%0A%0ATotal: MVR ${total.toFixed(2)}`;
 
       if (platform === 'whatsapp') {
         const whatsappUrl = `https://wa.me/+9607267338?text=${message}`;
