@@ -61,6 +61,16 @@
       margin-bottom: 30px;
       color: #28a745;
     }
+    .order-summary {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      width: 300px;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 15px 0 0 0;
+    }
   </style>
 </head>
 <body>
@@ -118,54 +128,20 @@
     </div>
   </div>
 
-  <!-- Contact Section -->
-  <div id="contact" class="section">
-    <div class="container">
-      <h2 class="text-center">Contact Us</h2>
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <form id="contact-form">
-            <div class="mb-3">
-              <label for="name" class="form-label">Name</label>
-              <input type="text" class="form-control" id="name" required>
-            </div>
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" required>
-            </div>
-            <div class="mb-3">
-              <label for="message" class="form-label">Message</label>
-              <textarea class="form-control" id="message" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-success">Send Message</button>
-          </form>
-        </div>
-      </div>
-    </div>
+  <!-- Order Summary -->
+  <div class="order-summary">
+    <h5>Order Summary</h5>
+    <ul id="order-items" class="list-unstyled"></ul>
+    <p><strong>Total: <span id="total-price">MVR 0</span></strong></p>
+    <button class="btn btn-success w-100" onclick="sendOrder()">Place Order</button>
   </div>
-
-  <!-- Social Links -->
-  <div class="text-center my-4">
-    <a href="https://viber.com" class="btn btn-success btn-social">
-      <i class="fab fa-viber"></i> Viber
-    </a>
-    <a href="https://telegram.com" class="btn btn-primary btn-social">
-      <i class="fab fa-telegram"></i> Telegram
-    </a>
-    <a href="https://whatsapp.com" class="btn btn-success btn-social">
-      <i class="fab fa-whatsapp"></i> WhatsApp
-    </a>
-  </div>
-
-  <!-- Footer -->
-  <footer class="footer text-center">
-    <p>&copy; 2025 FreshMart. All rights reserved.</p>
-  </footer>
 
   <script>
     const binId = '67ca3266e41b4d34e4a21490';
     const apiKey = '$2a$10$ISnzYBxkpDNeersZBo0mVe5v/iOr89sUQyl.zGdj3v.pGlKBJLYgu';
+    let order = []; // Stores selected items
 
+    // Fetch and display items
     async function fetchItems() {
       try {
         const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
@@ -179,6 +155,7 @@
       }
     }
 
+    // Display items in the list
     function displayItems(items) {
       const itemsList = document.getElementById('items-list');
       if (!itemsList) {
@@ -194,7 +171,7 @@
               <div class="card-body">
                 <h5 class="card-title">${item.name}</h5>
                 <p class="card-text">Price: MVR ${item.price} per ${item.unit}</p>
-                <p class="card-text"><small class="text-muted">Last updated: ${new Date(item.lastUpdated).toLocaleString()}</small></p>
+                <button class="btn btn-primary w-100" onclick="addToOrder(${item.id}, '${item.name}', ${item.price})">Add to Order</button>
               </div>
             </div>
           </div>
@@ -202,17 +179,42 @@
       }).join('');
     }
 
-    // Handle contact form submission
-    document.getElementById('contact-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const message = document.getElementById('message').value;
+    // Add item to order
+    function addToOrder(id, name, price) {
+      const item = { id, name, price, quantity: 1 };
+      const existingItem = order.find(i => i.id === id);
+      if (existingItem) {
+        existingItem.quantity += 1; // Increase quantity if item already exists
+      } else {
+        order.push(item); // Add new item to order
+      }
+      updateOrderSummary();
+    }
 
-      // Simulate sending the message (you can replace this with an actual API call)
-      alert(`Thank you, ${name}! Your message has been sent.`);
-      document.getElementById('contact-form').reset();
-    });
+    // Update order summary
+    function updateOrderSummary() {
+      const orderItems = document.getElementById('order-items');
+      const totalPrice = document.getElementById('total-price');
+      orderItems.innerHTML = order.map(item => `
+        <li>${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}</li>
+      `).join('');
+      const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      totalPrice.textContent = `MVR ${total}`;
+    }
+
+    function sendOrder() {
+  if (order.length === 0) {
+    alert('Your order is empty!');
+    return;
+  }
+  const orderDetails = order.map(item => `${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}`).join('%0A');
+  const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const message = `Order Details:%0A${orderDetails}%0A%0ATotal: MVR ${total}`;
+  const whatsappUrl = `https://wa.me/+9607267338?text=${message}`;
+  window.open(whatsappUrl, '_blank');
+  order = []; // Clear the order
+  updateOrderSummary();
+}
 
     fetchItems();
   </script>
