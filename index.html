@@ -63,13 +63,23 @@
     }
     .order-summary {
       position: fixed;
-      bottom: 0;
-      right: 0;
+      bottom: 20px;
+      right: 20px;
       width: 300px;
       background: white;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      border-radius: 15px 0 0 0;
+      border-radius: 15px;
+      z-index: 1000;
+    }
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .order-item button {
+      margin-left: 10px;
     }
   </style>
 </head>
@@ -171,7 +181,10 @@
               <div class="card-body">
                 <h5 class="card-title">${item.name}</h5>
                 <p class="card-text">Price: MVR ${item.price} per ${item.unit}</p>
-                <button class="btn btn-primary w-100" onclick="addToOrder(${item.id}, '${item.name}', ${item.price})">Add to Order</button>
+                <div class="d-flex align-items-center">
+                  <input type="number" id="quantity-${item.id}" class="form-control me-2" value="1" min="1" style="width: 80px;">
+                  <button class="btn btn-primary" onclick="addToOrder(${item.id}, '${item.name}', ${item.price})">Add to Order</button>
+                </div>
               </div>
             </div>
           </div>
@@ -181,10 +194,15 @@
 
     // Add item to order
     function addToOrder(id, name, price) {
-      const item = { id, name, price, quantity: 1 };
+      const quantity = parseInt(document.getElementById(`quantity-${id}`).value);
+      if (isNaN(quantity) || quantity < 1) {
+        alert('Please enter a valid quantity.');
+        return;
+      }
+      const item = { id, name, price, quantity };
       const existingItem = order.find(i => i.id === id);
       if (existingItem) {
-        existingItem.quantity += 1; // Increase quantity if item already exists
+        existingItem.quantity += quantity; // Increase quantity if item already exists
       } else {
         order.push(item); // Add new item to order
       }
@@ -196,10 +214,19 @@
       const orderItems = document.getElementById('order-items');
       const totalPrice = document.getElementById('total-price');
       orderItems.innerHTML = order.map(item => `
-        <li>${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}</li>
+        <li class="order-item">
+          <span>${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}</span>
+          <button class="btn btn-danger btn-sm" onclick="removeFromOrder(${item.id})">Remove</button>
+        </li>
       `).join('');
       const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
       totalPrice.textContent = `MVR ${total}`;
+    }
+
+    // Remove item from order
+    function removeFromOrder(id) {
+      order = order.filter(item => item.id !== id); // Remove item from order
+      updateOrderSummary();
     }
 
     function sendOrder() {
@@ -210,7 +237,7 @@
   const orderDetails = order.map(item => `${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}`).join('%0A');
   const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const message = `Order Details:%0A${orderDetails}%0A%0ATotal: MVR ${total}`;
-  const whatsappUrl = `https://wa.me/+9607267338?text=${message}`;
+  const whatsappUrl = `https://wa.me/YOUR_WHATSAPP_NUMBER?text=${message}`;
   window.open(whatsappUrl, '_blank');
   order = []; // Clear the order
   updateOrderSummary();
