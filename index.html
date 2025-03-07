@@ -237,7 +237,7 @@
   const orderDetails = order.map(item => `${item.name} (x${item.quantity}) - MVR ${item.price * item.quantity}`).join('%0A');
   const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const message = `Order Details:%0A${orderDetails}%0A%0ATotal: MVR ${total}`;
-  const whatsappUrl = `https://wa.me/YOUR_WHATSAPP_NUMBER?text=${message}`;
+  const whatsappUrl = `https://wa.me/+9607267338?text=${message}`;
   window.open(whatsappUrl, '_blank');
   order = []; // Clear the order
   updateOrderSummary();
