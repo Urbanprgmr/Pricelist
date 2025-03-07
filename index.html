@@ -54,6 +54,13 @@
       object-fit: cover;
       border-radius: 15px 15px 0 0;
     }
+    .section {
+      padding: 60px 0;
+    }
+    .section h2 {
+      margin-bottom: 30px;
+      color: #28a745;
+    }
   </style>
 </head>
 <body>
@@ -156,31 +163,43 @@
   </footer>
 
   <script>
-    const binId = 'YOUR_JSONBIN_BIN_ID';
-    const apiKey = 'YOUR_JSONBIN_API_KEY';
+    const binId = '67ca3266e41b4d34e4a21490';
+    const apiKey = '$2a$10$ISnzYBxkpDNeersZBo0mVe5v/iOr89sUQyl.zGdj3v.pGlKBJLYgu';
 
     async function fetchItems() {
-      const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-        headers: { 'X-Master-Key': apiKey }
-      });
-      const data = await response.json();
-      displayItems(data.record.items || []);
+      try {
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+          headers: { 'X-Master-Key': apiKey }
+        });
+        const data = await response.json();
+        console.log('Data fetched:', data); // Debugging
+        displayItems(data.record.items || []);
+      } catch (error) {
+        console.error('Error fetching items:', error); // Debugging
+      }
     }
 
     function displayItems(items) {
       const itemsList = document.getElementById('items-list');
-      itemsList.innerHTML = items.map(item => `
-        <div class="col-md-4 mb-4 animate__animated animate__fadeInUp">
-          <div class="card">
-            <img src="${item.image}" alt="${item.name}" class="item-image">
-            <div class="card-body">
-              <h5 class="card-title">${item.name}</h5>
-              <p class="card-text">Price: $${item.price} per ${item.unit}</p>
-              <p class="card-text"><small class="text-muted">Last updated: ${new Date(item.lastUpdated).toLocaleString()}</small></p>
+      if (!itemsList) {
+        console.error('items-list element not found'); // Debugging
+        return;
+      }
+      itemsList.innerHTML = items.map(item => {
+        console.log(`Item: ${item.name}, Image URL: ${item.image}`); // Debugging
+        return `
+          <div class="col-md-4 mb-4 animate__animated animate__fadeInUp">
+            <div class="card">
+              <img src="${item.image}" alt="${item.name}" class="item-image" onerror="this.src='https://via.placeholder.com/200';">
+              <div class="card-body">
+                <h5 class="card-title">${item.name}</h5>
+                <p class="card-text">Price: $${item.price} per ${item.unit}</p>
+                <p class="card-text"><small class="text-muted">Last updated: ${new Date(item.lastUpdated).toLocaleString()}</small></p>
+              </div>
             </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     // Handle contact form submission
